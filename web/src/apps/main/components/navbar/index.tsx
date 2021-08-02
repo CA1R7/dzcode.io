@@ -1,5 +1,6 @@
 import { Dispatch, StateInterface } from "src/apps/main/redux";
 import { FC, useState } from "react";
+import { FormControl, MenuItem, Select } from "@material-ui/core";
 import { animated, useSpring } from "react-spring";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +15,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import logo from "src/assets/svg/logo-wide.svg";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -93,10 +95,16 @@ const useStyles = makeStyles((theme) =>
 );
 
 export const Navbar: FC = () => {
-  const { settings, navbarComponent } = useSelector<StateInterface, StateInterface>(
-    (state) => state,
-  );
+  const {
+    settings: { darkMode, language },
+    navbarComponent: { sections },
+  } = useSelector<StateInterface, StateInterface>((state) => state);
   const dispatch = useDispatch<Dispatch<SettingsState>>();
+  const updateSettings = (payload: Partial<SettingsState>) => {
+    dispatch({ type: "UPDATE_SETTINGS", payload });
+  };
+  const { t } = useTranslation();
+
   const classes = useStyles();
   const [visible, setVisible] = useState(true);
   useScrollPosition(({ prevPos, currPos }) => {
@@ -128,18 +136,26 @@ export const Navbar: FC = () => {
           className={classes.switch}
           control={
             <IOSSwitch
-              checked={settings.darkMode ? true : false}
-              onChange={() => {
-                dispatch({
-                  type: "UPDATE_SETTINGS",
-                  payload: { darkMode: !settings.darkMode },
-                });
-              }}
+              checked={!!darkMode}
+              onChange={() => updateSettings({ darkMode: !darkMode })}
               name="darkMode"
             />
           }
-          label={settings.darkMode ? "🌙" : "🌞"}
+          label={darkMode ? "🌙" : "🌞"}
         />
+        <FormControl>
+          <Select
+            value={language}
+            name="language"
+            onChange={({ target: { value } }) =>
+              updateSettings({ language: value as SettingsState["language"] })
+            }
+          >
+            <MenuItem value="en">{t("NAVBAR_EN")}</MenuItem>
+            <MenuItem value="fr">{t("NAVBAR_FR")}</MenuItem>
+            <MenuItem value="ar">{t("NAVBAR_AR")}</MenuItem>
+          </Select>
+        </FormControl>
       </div>
       <Toolbar component="nav" variant="dense" className={classes.toolbarSecondary}>
         <Grid
@@ -165,8 +181,8 @@ export const Navbar: FC = () => {
             </Typography>
           </Hidden>
 
-          {navbarComponent.sections
-            ? navbarComponent.sections.map((section) => (
+          {sections
+            ? sections.map((section) => (
                 <LinkV2
                   color="inherit"
                   key={section.title}

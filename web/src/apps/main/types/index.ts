@@ -4,3 +4,5 @@ export interface SidebarTreeItem {
   link?: string;
   children?: SidebarTreeItem[];
 }
+
+export type LanguageCode = "en" | "fr" | "ar";
