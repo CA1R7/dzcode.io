@@ -3,6 +3,7 @@ import { FC } from "react";
 import ar from "./locals/ar.json";
 import fr from "./locals/fr.json";
 import en from "./locals/en.json";
+
 import { IntlProvider } from "react-intl";
 import { useSelector } from "react-redux";
 import { StateInterface } from "src/apps/main/redux";
